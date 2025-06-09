@@ -70,6 +70,16 @@ def kmeans(data, k):
     return labels, centroids
 
 
+def get_cmap(n, name='hsv'): #Func from Stack Overflow, just using it to generate colors
+    '''Returns a function that maps each index in 0, 1, ..., n-1 to a distinct
+    RGB color; the keyword argument name must be a standard mpl colormap name.'''
+    return plt.cm.get_cmap(name, n)
+
+def to_color(num):
+    cmap = get_cmap(len(centroids))
+    return cmap(num)
+
+
 def visualize_results(data, labels, centroids, path):
     """
     Visualizing results of the kmeans model, and saving the figure.
@@ -78,8 +88,14 @@ def visualize_results(data, labels, centroids, path):
     :param centroids: the final centroids of kmeans, as numpy array of shape (k, 2)
     :param path: path to save the figure to.
     """
-    pass
-    # plt.savefig(path)
+    df = pd.DataFrame(data)
+    df['labels'] = labels
+    df['color'] = df['labels'].apply(to_color)
+    all_data = df.to_numpy()
+    plt.scatter(all_data[:, 0], all_data[:, 1], c=df['color'])
+    plt.title(f'Results for kmeans with k = {k}')
+    plt.scatter(centroids[:, 0], centroids[:, 1], c='black', marker='X')
+    plt.savefig(path)
 
 
 def dist(x, y):
