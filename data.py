@@ -57,3 +57,10 @@ def data_analysis(df):
         value = list(sorted_dict_descending.items())[i][1]
         print(f"{i + 1}. {key} with {value:%6f}")
 
+
+    season_means = df.groupby('season').mean()
+    print(f"fall average t_diff is {season_means.loc[2, 't_diff']}")
+    print(f"spring average t_diff is {season_means.loc[0, 't_diff']}")
+    print(f"summer average t_diff is {season_means.loc[1, 't_diff']}")
+    print(f"winter average t_diff is {season_means.loc[3, 't_diff']}")
+    print(f"All average t_diff is {df.mean()['t_diff']}")
