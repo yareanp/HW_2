@@ -1,3 +1,4 @@
+import numpy
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -57,8 +58,16 @@ def kmeans(data, k):
     * labels - numpy array of size n, where each entry is the predicted label (cluster number)
     * centroids - numpy array of shape (k, 2), centroid for each cluster.
     """
-    pass
-    # return labels, centroids
+
+    prev_centroids = choose_initial_centroids(data, k)
+    labels = assign_to_clusters(data, prev_centroids)
+    curr_centroids = recompute_centroids(data, labels, k)
+    while curr_centroids != prev_centroids:
+        prev_centroids = curr_centroids
+        labels = assign_to_clusters(data, prev_centroids)
+        curr_centroids = recompute_centroids(data, labels, k)
+    centroids = curr_centroids
+    return labels, centroids
 
 
 def visualize_results(data, labels, centroids, path):
@@ -80,8 +89,20 @@ def dist(x, y):
     :param y: numpy array of size n
     :return: the euclidean distance
     """
-    pass
-    # return distance
+    sum = 0;
+    for i in range(len(x)):
+        sum += (x[i] - y[i]) ** 2
+    distance = np.sqrt(sum)
+    return distance
+
+def closest_centroid(loc, centroids):
+    mincent = 0
+    mindist = dist(loc, centroids[0])
+    for i in range(1, len(centroids)):
+        if dist(loc, centroids[i]) < mindist:
+            mindist = dist(loc, centroids[i])
+            mincent = i
+    return mincent
 
 
 def assign_to_clusters(data, centroids):
@@ -91,8 +112,8 @@ def assign_to_clusters(data, centroids):
     :param centroids: current centroids as numpy array of shape (k, 2)
     :return: numpy array of size n
     """
-    pass
-    # return labels
+    labels = numpy.array([closest_centroid(data[i],centroids) for i in range(data)])
+    return labels
 
 
 def recompute_centroids(data, labels, k):
@@ -103,6 +124,8 @@ def recompute_centroids(data, labels, k):
     :param k: number of clusters
     :return: numpy array of shape (k, 2)
     """
-    pass
-    # return centroids
+    df = pd.DataFrame(data)
+    df['labels'] = labels #no way for a centroid to not have any matching data points, so no need to adress it
+    centroids = numpy.array(df.groupby('labels').mean())
+    return centroids
 
