@@ -3,6 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 np.random.seed(2)
 
+def load_data(path):
+    return pd.read_csv(path)
 
 def add_noise(data):
     """
@@ -25,6 +27,13 @@ def choose_initial_centroids(data, k):
 
 
 # ====================
+def min_max_scaling(nump):
+    mins = np.min(nump, axis=0)
+    maxs = np.max(nump, axis=0)
+    return np.array((nump - mins) / (maxs-mins))
+
+
+
 def transform_data(df, features):
     """
     Performs the following transformations on df:
@@ -35,8 +44,8 @@ def transform_data(df, features):
     :param features: list of 2 features from the dataframe
     :return: transformed data as numpy array of shape (n, 2)
     """
-    pass
-    # return data
+    transformed_data = add_noise(min_max_scaling(df[[features[0], features[1]]].to_numpy()))
+    return transformed_data
 
 
 def kmeans(data, k):
