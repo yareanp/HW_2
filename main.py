@@ -1,8 +1,5 @@
 import data
 
-if __name__ == "__main__":
-    partA()
-    partB()
 
 def partA():
     print("Part A: ")
@@ -13,3 +10,9 @@ def partA():
 
 def partB():
     pass
+
+
+if __name__ == "__main__":
+    partA()
+    partB()
+
