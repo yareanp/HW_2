@@ -1,17 +1,19 @@
 import clustering
 import data
+import numpy as np
+import pandas as pd
 
 
 def partA():
     print("Part A: ")
-    df = data.load_data("london.csv")
+    df = data.load_data("london_sample_500.csv")
     df = data.add_new_columns(df)
     data.data_analysis(df)
     print()
 
 def partB():
     print("Part B: ")
-    df = data.load_data("london.csv")
+    df = data.load_data("london_sample_500.csv")
     transformed_df = clustering.transform_data(df, ["cnt", "t1"])
     for k in (2,3,5):
         print(f"k = {k}")

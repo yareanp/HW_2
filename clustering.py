@@ -4,8 +4,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 np.random.seed(2)
 
-def load_data(path):
-    return pd.read_csv(path)
 
 def add_noise(data):
     """
@@ -29,6 +27,11 @@ def choose_initial_centroids(data, k):
 
 # ====================
 def min_max_scaling(nump):
+    """
+    scales a nump array between 0 and 1
+    :param nump: dataset as numpy array of shape (n, 2)
+    :return: array of shape (n, 2) scaled between 0 and 1
+    """
     mins = np.min(nump, axis=0)
     maxs = np.max(nump, axis=0)
     return np.array((nump - mins) / (maxs-mins))
@@ -49,6 +52,19 @@ def transform_data(df, features):
     return transformed_data
 
 
+def centroids_changed(curr_centroids, prev_centroids,k):
+    """
+    checks if the centroids are equal
+    :param curr_centroids: numpy array of shape (n, 2)
+    :param prev_centroids: numpy array of shape (n, 2)
+    :param k: number of centroids
+    :return: true if all centroids in curr_centroids are equal to prev_centroids
+    """
+    for i in range(k):
+        if curr_centroids[i][0] != prev_centroids[i][0] or curr_centroids[i][1] != prev_centroids[i][1]:
+            return False
+    return True
+
 def kmeans(data, k):
     """
     Running kmeans clustering algorithm.
@@ -62,10 +78,11 @@ def kmeans(data, k):
     prev_centroids = choose_initial_centroids(data, k)
     labels = assign_to_clusters(data, prev_centroids)
     curr_centroids = recompute_centroids(data, labels, k)
-    while curr_centroids != prev_centroids:
+    while not centroids_changed(curr_centroids, prev_centroids,k):
         prev_centroids = curr_centroids
         labels = assign_to_clusters(data, prev_centroids)
         curr_centroids = recompute_centroids(data, labels, k)
+
     centroids = curr_centroids
     return labels, centroids
 
@@ -76,7 +93,8 @@ def get_cmap(n, name='hsv'): #Func from Stack Overflow, just using it to generat
     return plt.cm.get_cmap(name, n)
 
 def to_color(num):
-    cmap = get_cmap(len(centroids))
+    '''Used to set the colors of k_means graphs'''
+    cmap = get_cmap(5)
     return cmap(num)
 
 
@@ -93,7 +111,7 @@ def visualize_results(data, labels, centroids, path):
     df['color'] = df['labels'].apply(to_color)
     all_data = df.to_numpy()
     plt.scatter(all_data[:, 0], all_data[:, 1], c=df['color'])
-    plt.title(f'Results for kmeans with k = {k}')
+    plt.title(f'Results for kmeans with k = {len(centroids)}')
     plt.scatter(centroids[:, 0], centroids[:, 1], c='black', marker='X')
     plt.savefig(path)
 
@@ -112,6 +130,12 @@ def dist(x, y):
     return distance
 
 def closest_centroid(loc, centroids):
+    """
+    for a speicific datapoint, finds the closest centroid
+    :param loc: location of the datapoint
+    :param centroids: all centroids
+    :return: closest centroid to the datapoint
+    """
     mincent = 0
     mindist = dist(loc, centroids[0])
     for i in range(1, len(centroids)):
@@ -128,7 +152,7 @@ def assign_to_clusters(data, centroids):
     :param centroids: current centroids as numpy array of shape (k, 2)
     :return: numpy array of size n
     """
-    labels = numpy.array([closest_centroid(data[i],centroids) for i in range(data)])
+    labels = numpy.array([closest_centroid(data[i],centroids) for i in range(len(data))])
     return labels
 
 
